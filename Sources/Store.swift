@@ -12,6 +12,8 @@ struct AppSettings: Codable {
     var workspaceID: String = ""
     var task: String? = nil
     var enabled: Bool = true
+    var softSound: String = "Funk"
+    var hardSound: String = "Sosumi"
     var offTaskMinutes: Int = 1
     var hardAfterMinutes: Int = 2
     var hours: String = ""
@@ -31,6 +33,8 @@ struct AppSettings: Codable {
         workspaceID = try c.decodeIfPresent(String.self, forKey: .workspaceID) ?? d.workspaceID
         task = try c.decodeIfPresent(String.self, forKey: .task)
         enabled = try c.decodeIfPresent(Bool.self, forKey: .enabled) ?? d.enabled
+        softSound = try c.decodeIfPresent(String.self, forKey: .softSound) ?? d.softSound
+        hardSound = try c.decodeIfPresent(String.self, forKey: .hardSound) ?? d.hardSound
         offTaskMinutes = try c.decodeIfPresent(Int.self, forKey: .offTaskMinutes) ?? d.offTaskMinutes
         hardAfterMinutes = try c.decodeIfPresent(Int.self, forKey: .hardAfterMinutes) ?? d.hardAfterMinutes
         hours = try c.decodeIfPresent(String.self, forKey: .hours) ?? d.hours

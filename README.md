@@ -9,7 +9,7 @@
 
 > Мудборд сам себя не соберёт. Голы подождут.
 
-Через 2 минуты не по делу — мягкое предупреждение, через 5 — жёсткое.
+Через минуту не по делу — мягкое предупреждение со звуком, через две — жёсткое.
 Вернулся к задаче — всё гаснет.
 
 ## Установка
@@ -39,7 +39,8 @@ Xcode и другие инструменты не нужны. Работает �
 - **Сменить задачу / Задача сделана** — одна текущая задача.
 - **Это работа** — если программа ошиблась, это окно до конца дня считается работой.
 - **Перерыв 15 минут** — молчит четверть часа.
-- **Включён** — выключить совсем.
+- **Слежка включена** — выключить совсем.
+- **Звук** — свой звук для мягкого и жёсткого предупреждения или без звука.
 - **Сегодня: N проверок · $** — сколько потрачено.
 - **Запускать при входе** — стартовать вместе с Маком.
 - **Дополнительные настройки** — рабочие часы, минуты до предупреждения, модель.
@@ -80,7 +81,7 @@ git clone https://github.com/ValikW/adhd-killer && cd adhd-killer
 A tiny macOS menu bar app that keeps you from drifting off.
 You type what you are working on. It glances at the active window, and when you
 slip into YouTube, a feed or an unrelated chat, the screen edges glow red and a
-short line appears in the corner. Two minutes off task — a soft warning, five —
+short line appears in the corner. One minute off task — a soft warning with a sound, two —
 a hard one. Back on task — it fades.
 
 ### Install
