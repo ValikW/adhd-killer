@@ -21,8 +21,14 @@ done
 lipo -create -output "$APP/Contents/MacOS/ADHDKiller" build/ADHDKiller-arm64 build/ADHDKiller-x86_64
 rm -rf build/ADHDKiller-arm64 build/ADHDKiller-x86_64 build/cache
 
-# Ad-hoc signature: no Apple ID needed.
-codesign --force --sign "${SIGN_IDENTITY:--}" "$APP"
+# Ad-hoc signature: no Apple ID needed. The explicit requirement ties macOS
+# permissions (Accessibility) to the bundle id instead of this exact build,
+# so the user does not have to grant access again after every update.
+if [[ -n "${SIGN_IDENTITY:-}" ]]; then
+    codesign --force --sign "$SIGN_IDENTITY" "$APP"
+else
+    codesign --force --sign - -r='designated => identifier "com.valikw.adhdkiller"' "$APP"
+fi
 echo "Built: $APP"
 
 case "${1:-}" in
