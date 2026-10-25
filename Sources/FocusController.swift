@@ -82,7 +82,6 @@ final class FocusController {
                                    permitted: seen.permitted, hasKey: hasKey,
                                    firstTask: task, otherTasks: [])
         onChange(machine.snapshot)
-        Debug.log("tick app=\(seen.context?.appName ?? "-") title=\(seen.context?.windowTitle ?? "-") url=\(seen.context?.url ?? "-") permitted=\(seen.permitted) pause=\(String(describing: machine.snapshot.pause)) judging=\(command != nil)")
         guard case .judge(let request) = command, let judge else { return }
         let version = taskVersion
         judge.judge(request) { [weak self] result in
@@ -95,7 +94,6 @@ final class FocusController {
                     self.onChange(self.machine.snapshot)
                     return
                 }
-                Debug.log("verdict \(result)")
                 switch result {
                 case .success(let (judgement, input, output)):
                     self.machine.judged(key: request.key, judgement,
@@ -118,15 +116,3 @@ final class FocusController {
     }
 }
 
-/// Temporary diagnostics: ~/Library/Application Support/ADHDKiller/debug.log
-enum Debug {
-    static func log(_ line: String) {
-        let url = AppSettings.folder.appendingPathComponent("debug.log")
-        let text = "\(Date()) \(line)\n"
-        if let handle = try? FileHandle(forWritingTo: url) {
-            handle.seekToEndOfFile(); handle.write(Data(text.utf8)); try? handle.close()
-        } else {
-            try? Data(text.utf8).write(to: url)
-        }
-    }
-}
