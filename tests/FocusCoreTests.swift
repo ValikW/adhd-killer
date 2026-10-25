@@ -69,10 +69,10 @@ struct FocusCoreTests {
         _ = tick(machine, 20)
         machine.judged(key: context.key, Judgement(verdict: .offTask, confidence: 0.9, line: "Нет"),
                        inputTokens: 0, outputTokens: 0, now: start.addingTimeInterval(21))
-        _ = tick(machine, 140)
-        expect(machine.snapshot.alarm == .none, "before two minutes")
-        _ = tick(machine, 141)
-        expect(machine.snapshot.alarm == .soft, "soft after two minutes")
+        _ = tick(machine, 119)
+        expect(machine.snapshot.alarm == .none, "before two minutes on the screen")
+        _ = tick(machine, 120)
+        expect(machine.snapshot.alarm == .soft, "soft two minutes after opening the screen")
         _ = tick(machine, 321)
         expect(machine.snapshot.alarm == .hard, "hard after five minutes")
         machine.judged(key: context.key, Judgement(verdict: .onTask, confidence: 0.9, line: ""),

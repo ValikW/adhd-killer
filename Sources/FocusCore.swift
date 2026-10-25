@@ -308,7 +308,8 @@ final class FocusMachine {
     private func account(_ judgement: Judgement?, now: Date) {
         if judgement?.verdict == .offTask &&
            (judgement?.confidence ?? 0) >= FocusCore.Constants.confidenceThreshold {
-            if offTaskSince == nil { offTaskSince = now }
+            // Count from when this screen was opened, not from when the verdict arrived.
+            if offTaskSince == nil { offTaskSince = keySince ?? now }
             onTaskSince = nil
         } else if judgement?.verdict == .onTask &&
                   (judgement?.confidence ?? 0) >= FocusCore.Constants.confidenceThreshold {

@@ -44,10 +44,12 @@ final class FocusController {
         guard hasKey else { tick(); return }
         observer.onActivate = { [weak self] in self?.tick() }
         if machine.settings.enabled { observer.promptForPermission() }
-        timer = Timer.scheduledTimer(withTimeInterval: FocusCore.Constants.tickSeconds,
-                                     repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: FocusCore.Constants.tickSeconds, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
+        // .common keeps ticking while a menu is open.
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
         tick()
     }
 
