@@ -8,6 +8,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let overlay = FocusOverlay()
     private let character = FocusCharacter()
     private var focus: FocusController!
+    private var lastAlarm: Alarm = .none
+    private var lastSoundAt = Date.distantPast
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         menu.delegate = self
@@ -34,6 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func render(_ snapshot: FocusSnapshot) {
         overlay.show(snapshot.alarm)
+        playSound(for: snapshot.alarm)
         character.show(snapshot.alarm, line: snapshot.judgement?.line ?? "",
                        shortTask: Self.short(settings.task ?? "", 40))
         guard let button = statusItem.button else { return }
@@ -53,6 +56,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         button.image = image
         button.imagePosition = .imageLeading
         button.title = settings.task.map { " " + Self.short($0, 24) } ?? ""
+    }
+
+    /// Soft: one sound when it starts. Hard: a sound every 20 seconds. Empty name = silent.
+    private func playSound(for alarm: Alarm) {
+        defer { lastAlarm = alarm }
+        let now = Date()
+        switch alarm {
+        case .soft where lastAlarm == .none:
+            NSSound(named: settings.softSound)?.play()
+            lastSoundAt = now
+        case .hard where lastAlarm != .hard || now.timeIntervalSince(lastSoundAt) >= 20:
+            NSSound(named: settings.hardSound)?.play()
+            lastSoundAt = now
+        default:
+            return
+        }
+    }
+
+    private static let sounds: [String] = {
+        let files = (try? FileManager.default.contentsOfDirectory(atPath: "/System/Library/Sounds")) ?? []
+        return files.map { ($0 as NSString).deletingPathExtension }.sorted()
+    }()
+
+    private func soundMenu(title: String, selected: String, action: Selector) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        let submenu = NSMenu()
+        for name in [""] + Self.sounds {
+            let option = NSMenuItem(title: name.isEmpty ? L.t("Без звука", "No sound") : name,
+                                    action: action, keyEquivalent: "")
+            option.target = self
+            option.representedObject = name
+            option.state = name == selected ? .on : .off
+            submenu.addItem(option)
+        }
+        item.submenu = submenu
+        return item
     }
 
     private func statusText(_ snapshot: FocusSnapshot) -> String {
@@ -97,6 +136,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         add(L.t("Перерыв 15 минут", "Break for 15 minutes"), #selector(snooze), to: menu)
         add(L.t("Слежка включена", "Watching enabled"), #selector(toggleAction), to: menu).state = focus.isEnabled ? .on : .off
+        let sound = NSMenuItem(title: L.t("Звук", "Sound"), action: nil, keyEquivalent: "")
+        let soundSub = NSMenu()
+        soundSub.addItem(soundMenu(title: L.t("Мягкое предупреждение", "Soft warning"),
+                                   selected: settings.softSound, action: #selector(pickSoftSound(_:))))
+        soundSub.addItem(soundMenu(title: L.t("Жёсткое предупреждение", "Hard warning"),
+                                   selected: settings.hardSound, action: #selector(pickHardSound(_:))))
+        sound.submenu = soundSub
+        menu.addItem(sound)
         menu.addItem(.separator())
 
         let usage = focus.usage
@@ -154,6 +201,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func thisIsWork() { focus.perform(.thisIsWork) }
     @objc private func snooze() { focus.perform(.snooze) }
     @objc private func toggleAction() { toggle() }
+
+    @objc private func pickSoftSound(_ sender: NSMenuItem) {
+        settings.softSound = sender.representedObject as? String ?? ""
+        settings.save()
+        NSSound(named: settings.softSound)?.play()
+    }
+
+    @objc private func pickHardSound(_ sender: NSMenuItem) {
+        settings.hardSound = sender.representedObject as? String ?? ""
+        settings.save()
+        NSSound(named: settings.hardSound)?.play()
+    }
 
     private func toggle() {
         focus.perform(.toggle)
