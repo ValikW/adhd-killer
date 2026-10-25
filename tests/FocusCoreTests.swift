@@ -44,8 +44,8 @@ struct FocusCoreTests {
     static func stableAndInflight() {
         let machine = FocusMachine(settings: settings())
         expect(tick(machine, 0) == nil, "new context waits")
-        expect(tick(machine, 19) == nil, "19 seconds is too early")
-        expect(tick(machine, 20) != nil, "20 seconds sends request")
+        expect(tick(machine, 14) == nil, "14 seconds is too early")
+        expect(tick(machine, 15) != nil, "15 seconds sends request")
         expect(tick(machine, 25) == nil, "inflight blocks repeat")
         expect(machine.snapshot.awaiting, "inflight shown")
         expect(tick(machine, 50) != nil, "30-second timeout permits retry")
@@ -77,10 +77,8 @@ struct FocusCoreTests {
         expect(machine.snapshot.alarm == .hard, "hard after five minutes")
         machine.judged(key: context.key, Judgement(verdict: .onTask, confidence: 0.9, line: ""),
                        inputTokens: 0, outputTokens: 0, now: start.addingTimeInterval(322))
-        expect(machine.snapshot.alarm == .hard, "on-task requires 30 seconds")
-        _ = tick(machine, 352)
         expect(machine.snapshot.alarm == .none && machine.snapshot.offTaskSince == nil,
-               "on-task clears after 30 seconds")
+               "confident on-task clears at once")
     }
 
     static func lowConfidence() {
@@ -259,12 +257,12 @@ struct FocusCoreTests {
         _ = tick(machine, 0)
         _ = tick(machine, 20)
         machine.judged(key: context.key, Judgement(verdict: .onTask, confidence: 1, line: ""),
-                       inputTokens: 0, outputTokens: 0, now: start.addingTimeInterval(21))
+                       inputTokens: 0, outputTokens: 0, now: start.addingTimeInterval(30))
         let second = FocusContext(appName: "Safari", bundleID: "com.apple.Safari",
                                   windowTitle: "News", url: "https://example.org")
         expect(tick(machine, 22, context: second) == nil, "new key starts stability timer")
         expect(tick(machine, 40, context: second) == nil, "global call gap enforced")
-        expect(tick(machine, 42, context: second) != nil, "new call allowed after gap")
+        expect(tick(machine, 45, context: second) != nil, "new call allowed after gap")
     }
 
     static func main() {

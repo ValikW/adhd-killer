@@ -55,7 +55,7 @@ final class FocusCharacter: NSObject {
         container.layer?.borderWidth = alarm == .hard ? 1 : 0
         container.layer?.borderColor = NSColor.systemRed.cgColor
         message.stringValue = line.isEmpty
-            ? (alarm == .hard ? L.t("Пять минут не по делу. Возвращаемся.", "Five minutes off task. Back to work.")
+            ? (alarm == .hard ? L.t("Давно не по делу. Возвращаемся.", "Off task for a while. Back to work.")
                               : L.t("Задача: «\(shortTask)». Это не она.", "Task: “\(shortTask)”. This isn’t it."))
             : line
         let menu = NSMenu()
