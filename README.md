@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/icon.png" width="128" alt=""></p>
+
 # СДВГ Киллер · ADHD Killer
 
 **Русский** · [English](#english)
@@ -14,7 +16,9 @@
 
 ## Установка
 
-Открой **Терминал** и вставь одну строку:
+👉 **[Пошаговая инструкция для тех, кто не дружит с Терминалом](INSTALL.md)**
+
+Коротко: открой **Терминал** и вставь одну строку:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ValikW/adhd-killer/main/install.sh | bash
