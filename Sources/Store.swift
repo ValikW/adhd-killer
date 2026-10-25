@@ -12,8 +12,8 @@ struct AppSettings: Codable {
     var workspaceID: String = ""
     var task: String? = nil
     var enabled: Bool = true
-    var offTaskMinutes: Int = 2
-    var hardAfterMinutes: Int = 5
+    var offTaskMinutes: Int = 1
+    var hardAfterMinutes: Int = 2
     var hours: String = ""
     var weekdaysOnly: Bool = false
     var model: String = "claude-haiku-4-5"

@@ -2,9 +2,9 @@ import Foundation
 
 enum FocusCore {
     enum Constants {
-        static let tickSeconds: TimeInterval = 15
-        static let stableSeconds: TimeInterval = 20
-        static let minCallGapSeconds: TimeInterval = 20
+        static let tickSeconds: TimeInterval = 10
+        static let stableSeconds: TimeInterval = 15
+        static let minCallGapSeconds: TimeInterval = 15
         static let cacheTTLSeconds: TimeInterval = 300
         static let inflightTimeoutSeconds: TimeInterval = 30
         static let idleSeconds: TimeInterval = 180
@@ -310,7 +310,13 @@ final class FocusMachine {
            (judgement?.confidence ?? 0) >= FocusCore.Constants.confidenceThreshold {
             if offTaskSince == nil { offTaskSince = now }
             onTaskSince = nil
+        } else if judgement?.verdict == .onTask &&
+                  (judgement?.confidence ?? 0) >= FocusCore.Constants.confidenceThreshold {
+            // Back on a screen known to be work: the warning goes away at once.
+            offTaskSince = nil
+            onTaskSince = now
         } else {
+            // Unknown screen: keep the warning for a while so a quick glance does not reset it.
             if onTaskSince == nil { onTaskSince = now }
             if let onTaskSince, now.timeIntervalSince(onTaskSince) >= FocusCore.Constants.onTaskClearSeconds {
                 offTaskSince = nil

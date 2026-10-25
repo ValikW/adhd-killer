@@ -44,10 +44,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case (_, .some): symbol = "pause.circle"
         default: symbol = "scope"
         }
-        button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "ADHD Killer")
+        var image = NSImage(systemSymbolName: symbol, accessibilityDescription: "ADHD Killer")
+        if snapshot.alarm != .none {
+            // Only the icon turns red; the title keeps the menu bar's own color.
+            image = image?.withSymbolConfiguration(.init(paletteColors: [.systemRed]))
+            image?.isTemplate = false
+        }
+        button.image = image
         button.imagePosition = .imageLeading
         button.title = settings.task.map { " " + Self.short($0, 24) } ?? ""
-        button.contentTintColor = snapshot.alarm == .none ? nil : .systemRed
     }
 
     private func statusText(_ snapshot: FocusSnapshot) -> String {
@@ -85,13 +90,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         add(settings.task == nil ? L.t("Указать задачу…", "Set task…") : L.t("Сменить задачу…", "Change task…"),
             #selector(changeTask), key: "n", to: menu)
         if settings.task != nil {
-            add(L.t("Задача сделана ✓", "Task done ✓"), #selector(taskDoneAction), to: menu)
+            add(L.t("Задача сделана", "Task done"), #selector(taskDoneAction), to: menu)
         }
         if snapshot.context != nil && focus.isEnabled {
             add(L.t("Это работа (до конца дня)", "This is work (until tomorrow)"), #selector(thisIsWork), to: menu)
         }
         add(L.t("Перерыв 15 минут", "Break for 15 minutes"), #selector(snooze), to: menu)
-        add(L.t("Включён", "Enabled"), #selector(toggleAction), to: menu).state = focus.isEnabled ? .on : .off
+        add(L.t("Слежка включена", "Watching enabled"), #selector(toggleAction), to: menu).state = focus.isEnabled ? .on : .off
         menu.addItem(.separator())
 
         let usage = focus.usage
